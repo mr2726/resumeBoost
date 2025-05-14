@@ -124,7 +124,6 @@ const StripePaymentForm = ({ clientSecret, onPaymentSuccess, onPaymentError }) =
 export default function FinalResumePage() {
   const { resumeData, isLoading: contextLoading, error: contextError, setResumeData, setIsLoading, setError } = useResume();
   const router = useRouter();
-  const searchParams = useSearchParams(); // Keep for potential future use or non-payment query params
   const { toast } = useToast();
 
   const [isDownloadingHtml, setIsDownloadingHtml] = useState(false);
@@ -132,7 +131,14 @@ export default function FinalResumePage() {
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [stripeError, setStripeError] = useState<string | null>(null);
- 
+
+  const SuspendedSearchParams = () => {
+    const searchParams = useSearchParams();
+    return searchParams;
+  };
+
+  const searchParams = SuspendedSearchParams();
+
   // Check if payment was completed via localStorage, e.g. after a page refresh
   useEffect(() => {
     if (sessionStorage.getItem('paymentCompleted') === 'true') {
