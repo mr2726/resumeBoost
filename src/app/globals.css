@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 220 17% 97%; /* Soft White #F9FAFB */
+    --foreground: 222 47% 11%; /* Dark Navy/Black for text */
+
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 225 63% 33%; /* Navy Blue #1E3A8A */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    --secondary: 215 28% 93%; /* Lighter gray, derived from Soft White */
+    --secondary-foreground: 225 63% 33%; /* Navy Blue on Lighter gray */
+
+    --muted: 215 20% 85%; /* Gray for muted elements */
+    --muted-foreground: 215 10% 45%; /* Gray #6B7280 for muted text */
+
+    --accent: 170 65% 52%; /* Teal #2DD4BF */
+    --accent-foreground: 0 0% 100%; /* White */
+
+    --destructive: 0 90% 70%; /* Soft Red #F87171 */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 215 15% 75%; /* Gray for borders */
+    --input: 215 15% 75%; /* Gray for input borders */
+    --ring: 170 65% 52%; /* Teal for focus rings */
+
+    --radius: 0.5rem; /* 8px */
+
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    /* Sidebar variables - maintain or adjust as needed, though not primary for this app */
+    --sidebar-background: 225 63% 33%; /* Navy Blue */
+    --sidebar-foreground: 0 0% 100%; /* White */
+    --sidebar-primary: 170 65% 52%; /* Teal */
+    --sidebar-primary-foreground: 0 0% 100%; /* White */
+    --sidebar-accent: 225 50% 45%; /* Darker Navy */
+    --sidebar-accent-foreground: 0 0% 100%; /* White */
+    --sidebar-border: 225 50% 45%;
+    --sidebar-ring: 170 65% 52%;
+  }
+
+  .dark {
+    --background: 222 47% 11%; /* Dark Navy */
+    --foreground: 220 17% 97%; /* Soft White */
+
+    --card: 222 40% 15%; /* Darker Card */
+    --card-foreground: 220 17% 97%;
+
+    --popover: 222 40% 15%;
+    --popover-foreground: 220 17% 97%;
+
+    --primary: 170 65% 52%; /* Teal as primary in dark */
+    --primary-foreground: 222 47% 11%; /* Dark text on Teal */
+
+    --secondary: 222 30% 20%; /* Darker secondary */
+    --secondary-foreground: 220 17% 97%;
+
+    --muted: 222 30% 20%;
+    --muted-foreground: 215 10% 55%; /* Lighter Gray */
+
+    --accent: 225 63% 33%; /* Navy Blue as accent in dark */
+    --accent-foreground: 0 0% 100%; /* White */
+
+    --destructive: 0 70% 60%; /* Adjusted Soft Red */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 30% 25%;
+    --input: 222 30% 25%;
+    --ring: 170 65% 52%; /* Teal */
+
+    /* Dark Sidebar variables */
+    --sidebar-background: 222 40% 15%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 170 65% 52%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 222 30% 20%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 30% 25%;
+    --sidebar-ring: 170 65% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    line-height: 1.5;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply leading-tight;
+  }
+}
