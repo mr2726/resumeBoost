@@ -1,4 +1,3 @@
-
 // @ts-nocheck
 "use client";
 
@@ -8,7 +7,7 @@ import { useResume } from "@/contexts/ResumeContext";
 import { ArrowLeft, Download, FilePlus2, Loader2, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { prepareHtmlForDownload, createPaymentIntent } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -250,70 +249,72 @@ export default function FinalResumePage() {
   const isStripeConfigured = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <header className="mb-10 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold">Your Resume is Ready!</h1>
-        <p className="text-muted-foreground text-lg mt-2">
-          {paymentCompleted 
-            ? "You can now download your professionally crafted resume."
-            : "Please complete the $1 payment to download your resume."}
-        </p>
-      </header>
+    <Suspense fallback={<div className='text-center py-20'><Loader2 className='mx-auto h-12 w-12 animate-spin text-accent' /> <p className='mt-4 text-lg'>Loading...</p></div>}>
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-10 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold">Your Resume is Ready!</h1>
+          <p className="text-muted-foreground text-lg mt-2">
+            {paymentCompleted 
+              ? "You can now download your professionally crafted resume."
+              : "Please complete the $1 payment to download your resume."}
+          </p>
+        </header>
 
-      {resumeData && <ResumeDisplay resumeData={resumeData} isPreview={!paymentCompleted} />}
+        {resumeData && <ResumeDisplay resumeData={resumeData} isPreview={!paymentCompleted} />}
 
-      {!paymentCompleted ? (
-        <div className="mt-10 text-center max-w-md mx-auto">
-          {!isStripeConfigured ? (
-             <p className="my-4 text-sm text-red-500">Payment system not configured. Admin: please set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in .env</p>
-          ) : stripeError ? (
-            <p className="my-4 text-sm text-red-500">Error initializing payment: {stripeError}</p>
-          ) : clientSecret ? (
-            <Elements stripe={getStripePromise()} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-              <StripePaymentForm 
-                clientSecret={clientSecret} 
-                onPaymentSuccess={handlePaymentSuccess}
-                onPaymentError={handlePaymentError}
-              />
-            </Elements>
-          ) : (
-            <div className="text-center py-10"><Loader2 className="mx-auto h-8 w-8 animate-spin text-accent" /> <p className="mt-2 text-sm">Initializing payment...</p></div>
-          )}
-        </div>
-      ) : (
-        <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-          <Button 
-            size="lg" 
-            onClick={handleDownloadHtml} 
-            disabled={isDownloadingHtml}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold rounded-lg shadow-md hover:shadow-lg w-full sm:w-auto"
+        {!paymentCompleted ? (
+          <div className="mt-10 text-center max-w-md mx-auto">
+            {!isStripeConfigured ? (
+              <p className="my-4 text-sm text-red-500">Payment system not configured. Admin: please set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in .env</p>
+            ) : stripeError ? (
+              <p className="my-4 text-sm text-red-500">Error initializing payment: {stripeError}</p>
+            ) : clientSecret ? (
+              <Elements stripe={getStripePromise()} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
+                <StripePaymentForm 
+                  clientSecret={clientSecret} 
+                  onPaymentSuccess={handlePaymentSuccess}
+                  onPaymentError={handlePaymentError}
+                />
+              </Elements>
+            ) : (
+              <div className="text-center py-10"><Loader2 className="mx-auto h-8 w-8 animate-spin text-accent" /> <p className="mt-2 text-sm">Initializing payment...</p></div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <Button 
+              size="lg" 
+              onClick={handleDownloadHtml} 
+              disabled={isDownloadingHtml}
+              className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold rounded-lg shadow-md hover:shadow-lg w-full sm:w-auto"
+            >
+              {isDownloadingHtml ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Download className="mr-2 h-5 w-5" />}
+              Download HTML
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={handleDownloadPdf} 
+              disabled={isDownloadingPdf}
+              variant="secondary" 
+              className="rounded-lg shadow-md hover:shadow-lg w-full sm:w-auto"
+            >
+              {isDownloadingPdf ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Download className="mr-2 h-5 w-5" />}
+              Download PDF (Demo)
+            </Button>
+          </div>
+        )}
+        
+        <div className="mt-8 text-center">
+          <Button
+              onClick={handleStartOver}
+              variant="outline"
+              size="lg"
+              className="rounded-lg text-primary border-primary hover:bg-primary/5 w-full sm:w-auto"
           >
-            {isDownloadingHtml ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Download className="mr-2 h-5 w-5" />}
-            Download HTML
-          </Button>
-          <Button 
-            size="lg" 
-            onClick={handleDownloadPdf} 
-            disabled={isDownloadingPdf}
-            variant="secondary" 
-            className="rounded-lg shadow-md hover:shadow-lg w-full sm:w-auto"
-          >
-            {isDownloadingPdf ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Download className="mr-2 h-5 w-5" />}
-            Download PDF (Demo)
+              <FilePlus2 className="mr-2 h-5 w-5" /> Start New Resume
           </Button>
         </div>
-      )}
-      
-      <div className="mt-8 text-center">
-        <Button
-            onClick={handleStartOver}
-            variant="outline"
-            size="lg"
-            className="rounded-lg text-primary border-primary hover:bg-primary/5 w-full sm:w-auto"
-        >
-            <FilePlus2 className="mr-2 h-5 w-5" /> Start New Resume
-        </Button>
       </div>
-    </div>
+    </Suspense>
   );
 }
