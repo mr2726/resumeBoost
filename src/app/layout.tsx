@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import { Inter, Montserrat, Open_Sans } from 'next/font/google'; // Geist was used before, spec asks for Montserrat & Open Sans
 import './globals.css';
@@ -31,8 +30,10 @@ const openSans = Open_Sans({
 
 
 export const metadata: Metadata = {
-  title: 'ResumeBoost - AI-Powered Resume Builder',
-  description: "See an example resume created with ResumeBoost's AI. Build yours in minutes for $1.",
+  title: "Resume Boost",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
