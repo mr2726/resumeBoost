@@ -7,6 +7,7 @@ import { useResume } from "@/contexts/ResumeContext";
 import { ArrowLeft, Download, FilePlus2, Loader2, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState, Suspense } from "react";
 import { prepareHtmlForDownload, createPaymentIntent } from "../actions";
 import { useToast } from "@/hooks/use-toast";
