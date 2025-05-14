@@ -15,6 +15,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
@@ -199,12 +201,52 @@ export default function FinalResumePage() {
 
   const handleDownloadPdf = async () => {
     setIsDownloadingPdf(true);
-    toast({
-      title: "PDF Download (Demo)",
-      description: "PDF generation is a complex feature. For this demo, HTML will be downloaded instead.",
-      variant: "default",
-    });
-    await handleDownloadHtml(); 
+
+    if (!resumeData) {
+        toast({ title: "Error", description: "No resume data available to generate PDF.", variant: "destructive" });
+        setIsDownloadingPdf(false);
+        return;
+    }
+
+    try {
+        const resumeElement = document.querySelector('#resume-display'); // Ensure this ID is set on the ResumeDisplay component
+        if (!resumeElement) {
+            throw new Error('Resume element not found');
+        }
+
+        const canvas = await html2canvas(resumeElement, {
+            scale: 2, // Increase scale for better quality
+            useCORS: true, // Enable cross-origin resource sharing for images
+        });
+        const imgData = canvas.toDataURL('image/png');
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4', // Use A4 format for standard PDF size
+        });
+
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * pageWidth) / canvas.width; // Maintain aspect ratio
+
+        let position = 0;
+
+        while (position < imgHeight - 1) { // Subtract 1 to avoid adding an extra page due to rounding errors
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, Math.min(imgHeight - position, pageHeight));
+            position += pageHeight;
+            if (position < imgHeight - 1) pdf.addPage();
+        }
+
+        pdf.save('resume.pdf');
+
+        toast({ title: "Success", description: "PDF resume downloaded." });
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast({ title: "Error", description: "Failed to generate PDF.", variant: "destructive" });
+    }
+
     setIsDownloadingPdf(false);
   };
 
@@ -245,7 +287,12 @@ export default function FinalResumePage() {
   const isStripeConfigured = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
   return (
-    <Suspense fallback={<div className='text-center py-20'><Loader2 className='mx-auto h-12 w-12 animate-spin text-accent' /> <p className='mt-4 text-lg'>Loading...</p></div>}>
+    <Suspense fallback={
+      <div className='text-center py-20'>
+        <Loader2 className='mx-auto h-12 w-12 animate-spin text-accent' />
+        <p className='mt-4 text-lg'>Loading...</p>
+      </div>
+    }>
       <SearchParamsWrapper>
         {(searchParams) => (
           <div className="max-w-4xl mx-auto">
@@ -258,7 +305,7 @@ export default function FinalResumePage() {
               </p>
             </header>
 
-            {resumeData && <ResumeDisplay resumeData={resumeData} isPreview={!paymentCompleted} />}
+            {resumeData && <ResumeDisplay resumeData={resumeData} isPreview={!paymentCompleted} id="resume-display" />}
 
             {!paymentCompleted ? (
               <div className="mt-10 text-center max-w-md mx-auto">
@@ -297,7 +344,7 @@ export default function FinalResumePage() {
                   className="rounded-lg shadow-md hover:shadow-lg w-full sm:w-auto"
                 >
                   {isDownloadingPdf ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Download className="mr-2 h-5 w-5" />}
-                  Download PDF (Demo)
+                  Download PDF
                 </Button>
               </div>
             )}

@@ -1,4 +1,3 @@
-
 // @ts-nocheck
 "use client";
 
@@ -240,6 +239,7 @@ export default function ResumeDisplay({ resumeData, isPreview = false }: ResumeD
 
   return (
     <div 
+      id="resume-display" // Added ID for PDF generation
       style={styles.resumeContainer}
       onContextMenu={handleContextMenu}
       className={cn(isPreview && "select-none")} 
